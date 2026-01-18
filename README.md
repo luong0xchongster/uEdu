@@ -73,8 +73,8 @@ docker-compose up -d
 ```
 
 3. Access the applications:
-- Admin Portal: http://localhost:3000
-- Student Portal: http://localhost:3001
+- Admin Portal: http://localhost:3001
+- Student Portal: http://localhost:3002
 - API: http://localhost:8080
 
 ## Local Development
@@ -127,7 +127,7 @@ npm install
 npm run dev
 ```
 
-The admin portal will be available at http://localhost:3000
+The admin portal will be available at http://localhost:3000 (local) or http://localhost:3001 (Docker)
 
 ### Student Portal Setup
 
@@ -146,7 +146,7 @@ npm install
 npm run dev
 ```
 
-The student portal will be available at http://localhost:3001
+The student portal will be available at http://localhost:3000 (local) or http://localhost:3002 (Docker)
 
 ## API Documentation
 

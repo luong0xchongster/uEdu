@@ -1,5 +1,3 @@
-'use client'
-
 import Navbar from '@/components/Navbar'
 import { BookOpen, Users, TrendingUp, Clock } from 'lucide-react'
 
