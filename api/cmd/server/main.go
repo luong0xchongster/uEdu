@@ -29,7 +29,7 @@ func main() {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:3001"},
+		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:3001", "http://localhost:3002"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -78,6 +78,16 @@ func main() {
 		api.POST("/exam-results/submit", examResultHandler.SubmitExam)
 		api.GET("/exam-results", examResultHandler.GetExamResults)
 		api.GET("/exam-results/:id/details", examResultHandler.GetExamResultDetails)
+
+		classHandler := handlers.NewClassHandler(database.DB)
+		api.GET("/classes", classHandler.GetClasses)
+		api.GET("/classes/:id", classHandler.GetClass)
+		api.POST("/classes", classHandler.CreateClass)
+		api.PUT("/classes/:id", classHandler.UpdateClass)
+		api.DELETE("/classes/:id", classHandler.DeleteClass)
+		api.GET("/classes/teacher/:teacher_id", classHandler.GetClassesByTeacher)
+		api.GET("/classes/student/:student_id", classHandler.GetClassesByStudent)
+		api.GET("/events", classHandler.GetAllEvents)
 	}
 
 	port := os.Getenv("PORT")

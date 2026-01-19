@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Users, GraduationCap, BookOpen, BarChart3, FileText, LogOut } from 'lucide-react'
+import { Users, GraduationCap, BookOpen, BarChart3, FileText, Calendar, LogOut } from 'lucide-react'
 
 export default function Sidebar() {
   const navigation = [
@@ -7,6 +7,7 @@ export default function Sidebar() {
     { name: 'Students', href: '/students', icon: Users },
     { name: 'Teachers', href: '/teachers', icon: GraduationCap },
     { name: 'Courses', href: '/courses', icon: BookOpen },
+    { name: 'Schedule', href: '/schedule', icon: Calendar },
     { name: 'Exams', href: '/exams', icon: FileText },
   ]
 
