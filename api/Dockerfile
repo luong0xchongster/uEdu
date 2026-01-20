@@ -5,6 +5,6 @@ WORKDIR /app
 RUN apk add --no-cache git
 
 COPY . .
-RUN go build -o server ./cmd/main
+RUN go build -o server ./cmd/main.go
 
 CMD ["./server"]
