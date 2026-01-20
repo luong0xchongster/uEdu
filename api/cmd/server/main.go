@@ -92,6 +92,15 @@ func main() {
 			ai.POST("/grading/rubric", aiHandler.GenerateRubric)
 			ai.POST("/adaptive-difficulty", aiHandler.AdaptiveDifficulty)
 		}
+		classHandler := handlers.NewClassHandler(database.DB)
+		api.GET("/classes", classHandler.GetClasses)
+		api.GET("/classes/:id", classHandler.GetClass)
+		api.POST("/classes", classHandler.CreateClass)
+		api.PUT("/classes/:id", classHandler.UpdateClass)
+		api.DELETE("/classes/:id", classHandler.DeleteClass)
+		api.GET("/classes/teacher/:teacher_id", classHandler.GetClassesByTeacher)
+		api.GET("/classes/student/:student_id", classHandler.GetClassesByStudent)
+		api.GET("/events", classHandler.GetAllEvents)
 	}
 
 	port := os.Getenv("PORT")

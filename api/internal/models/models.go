@@ -186,4 +186,30 @@ type StudentAnalytics struct {
 	Strengths         string    `json:"strengths"`
 	RecommendedLevel  string    `json:"recommended_level"`
 	LastUpdated       time.Time `json:"last_updated"`
+type ClassWithDetails struct {
+	ID             int       `json:"id"`
+	CourseID       int       `json:"course_id"`
+	TeacherID      int       `json:"teacher_id"`
+	Title          string    `json:"title"`
+	Description    string    `json:"description"`
+	ClassDate      time.Time `json:"class_date"`
+	Duration       int       `json:"duration"`
+	Room           string    `json:"room"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	CourseName     string    `json:"course_name"`
+	TeacherFirstName string   `json:"teacher_first_name"`
+	TeacherLastName  string   `json:"teacher_last_name"`
+}
+
+type Event struct {
+	Type            string    `json:"type"`
+	ID              int       `json:"id"`
+	Title           string    `json:"title"`
+	Date            time.Time `json:"date"`
+	Duration        int       `json:"duration"`
+	Room            string    `json:"room"`
+	CourseName      string    `json:"course_name"`
+	TeacherFirstName string   `json:"teacher_first_name"`
+	TeacherLastName  string   `json:"teacher_last_name"`
 }
