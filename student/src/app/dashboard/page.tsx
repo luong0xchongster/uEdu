@@ -1,4 +1,5 @@
 import Navbar from '@/components/Navbar'
+import AIChatbotWidget from '@/components/AIChatbotWidget'
 import { BookOpen, Users, TrendingUp, Clock } from 'lucide-react'
 
 export default function Home() {
@@ -88,6 +89,7 @@ export default function Home() {
           </div>
         </div>
       </main>
+      <AIChatbotWidget studentId={1} studentLevel="B1" />
     </div>
   )
 }

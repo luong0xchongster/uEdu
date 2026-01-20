@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Clock, CheckCircle, XCircle, ArrowLeft } from 'lucide-react'
 import axios from 'axios'
+import AudioRecorder from '@/components/AudioRecorder'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 
@@ -16,6 +17,10 @@ interface Question {
   correct_answer: string
   points: number
   order: number
+  passage?: string
+  audio_url?: string
+  explanation?: string
+  grading_rubric?: string
 }
 
 interface ExamData {
@@ -302,6 +307,140 @@ export default function ExamPage() {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       rows={3}
                     />
+                  </div>
+                )}
+
+                {question.question_type === 'fill_blank' && (
+                  <div className="ml-14">
+                    <input
+                      type="text"
+                      value={answers[question.id] || ''}
+                      onChange={(e) => handleAnswer(question.id, e.target.value)}
+                      placeholder="Type the missing word(s)..."
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                )}
+
+                {question.question_type === 'matching' && (
+                  <div className="ml-14 space-y-3">
+                    {(() => {
+                      let options: string[] = []
+                      try {
+                        options = JSON.parse(question.options)
+                      } catch (e) {
+                        return <div className="text-sm text-gray-500">Invalid matching options</div>
+                      }
+                      return options.map((option, optIndex) => (
+                        <div key={optIndex} className="flex items-center gap-3">
+                          <span className="text-sm font-medium text-gray-700 w-6">{optIndex + 1}.</span>
+                          <input
+                            type="text"
+                            value={(answers[question.id] as any)?.[optIndex] || ''}
+                            onChange={(e) => {
+                              const current = (answers[question.id] as any) || {}
+                              handleAnswer(question.id, JSON.stringify({ ...current, [optIndex]: e.target.value }))
+                            }}
+                            placeholder="Match with..."
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                      ))
+                    })()}
+                  </div>
+                )}
+
+                {question.question_type === 'reading_comprehension' && (
+                  <div className="ml-14 space-y-4">
+                    {question.passage && (
+                      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <h4 className="font-medium text-gray-900 mb-2">Reading Passage</h4>
+                        <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
+                          {question.passage}
+                        </p>
+                      </div>
+                    )}
+                    {(() => {
+                      let options: string[] = []
+                      try {
+                        options = JSON.parse(question.options)
+                      } catch (e) {
+                        return null
+                      }
+                      return options.map((option, optIndex) => (
+                        <label
+                          key={optIndex}
+                          className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                            answers[question.id] === option
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name={`question-${question.id}`}
+                            value={option}
+                            checked={answers[question.id] === option}
+                            onChange={() => handleAnswer(question.id, option)}
+                            className="w-5 h-5 text-blue-600"
+                          />
+                          <span className="text-gray-900">{option}</span>
+                        </label>
+                      ))
+                    })()}
+                  </div>
+                )}
+
+                {question.question_type === 'writing' && (
+                  <div className="ml-14 space-y-3">
+                    <textarea
+                      value={answers[question.id] || ''}
+                      onChange={(e) => handleAnswer(question.id, e.target.value)}
+                      placeholder="Write your response here..."
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      rows={8}
+                    />
+                    <p className="text-xs text-gray-500">
+                      This answer will be evaluated by AI. Provide a well-structured response.
+                    </p>
+                  </div>
+                )}
+
+                {question.question_type === 'speaking' && (
+                  <div className="ml-14 space-y-3">
+                    {question.passage && (
+                      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <h4 className="font-medium text-gray-900 mb-2">Speaking Prompt</h4>
+                        <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
+                          {question.passage}
+                        </p>
+                      </div>
+                    )}
+                    <AudioRecorder
+                      onRecordingComplete={(blob) => {
+                        const reader = new FileReader()
+                        reader.onloadend = () => {
+                          const base64data = reader.result as string
+                          handleAnswer(question.id, base64data)
+                        }
+                        reader.readAsDataURL(blob)
+                      }}
+                      duration={60}
+                    />
+                  </div>
+                )}
+                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <p className="text-sm text-yellow-800">
+                        <strong>Note:</strong> Audio recording will be available in the mobile app or desktop application. For now, please type your response.
+                      </p>
+                      <textarea
+                        value={answers[question.id] || ''}
+                        onChange={(e) => handleAnswer(question.id, e.target.value)}
+                        placeholder="Type your spoken response here..."
+                        className="w-full mt-3 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        rows={4}
+                      />
+                    </div>
                   </div>
                 )}
               </div>
