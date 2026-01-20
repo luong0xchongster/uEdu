@@ -60,5 +60,17 @@ services:
     depends_on:
       - api
 
+  landing:
+    build:
+      context: ./landing
+      dockerfile: Dockerfile
+    container_name: uedu-landing
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+    depends_on:
+      - api
+
 volumes:
   postgres_data:
