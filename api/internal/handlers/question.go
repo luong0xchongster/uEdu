@@ -19,7 +19,8 @@ func NewQuestionHandler(db *sql.DB) *QuestionHandler {
 func (h *QuestionHandler) GetQuestions(c *gin.Context) {
 	examID := c.Param("exam_id")
 	rows, err := h.DB.Query(`
-		SELECT id, exam_id, question_text, question_type, options, correct_answer, points, order_num, created_at, updated_at 
+		SELECT id, exam_id, question_text, question_type, options, correct_answer, points, order_num, 
+		       passage, audio_url, explanation, grading_rubric, created_at, updated_at 
 		FROM questions WHERE exam_id = $1 ORDER BY order_num ASC
 	`, examID)
 	if err != nil {
@@ -32,7 +33,8 @@ func (h *QuestionHandler) GetQuestions(c *gin.Context) {
 	for rows.Next() {
 		var q models.Question
 		if err := rows.Scan(&q.ID, &q.ExamID, &q.QuestionText, &q.QuestionType, &q.Options, 
-			&q.CorrectAnswer, &q.Points, &q.Order, &q.CreatedAt, &q.UpdatedAt); err != nil {
+			&q.CorrectAnswer, &q.Points, &q.Order, &q.Passage, &q.AudioURL, &q.Explanation, 
+			&q.GradingRubric, &q.CreatedAt, &q.UpdatedAt); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
@@ -46,10 +48,12 @@ func (h *QuestionHandler) GetQuestion(c *gin.Context) {
 	id := c.Param("id")
 	var q models.Question
 	err := h.DB.QueryRow(`
-		SELECT id, exam_id, question_text, question_type, options, correct_answer, points, order_num, created_at, updated_at 
+		SELECT id, exam_id, question_text, question_type, options, correct_answer, points, order_num, 
+		       passage, audio_url, explanation, grading_rubric, created_at, updated_at 
 		FROM questions WHERE id = $1
 	`, id).Scan(&q.ID, &q.ExamID, &q.QuestionText, &q.QuestionType, &q.Options, 
-		&q.CorrectAnswer, &q.Points, &q.Order, &q.CreatedAt, &q.UpdatedAt)
+		&q.CorrectAnswer, &q.Points, &q.Order, &q.Passage, &q.AudioURL, &q.Explanation, 
+		&q.GradingRubric, &q.CreatedAt, &q.UpdatedAt)
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Question not found"})
@@ -71,10 +75,11 @@ func (h *QuestionHandler) CreateQuestion(c *gin.Context) {
 	}
 
 	err := h.DB.QueryRow(`
-		INSERT INTO questions (exam_id, question_text, question_type, options, correct_answer, points, order_num) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7) 
+		INSERT INTO questions (exam_id, question_text, question_type, options, correct_answer, points, order_num, passage, audio_url, explanation, grading_rubric) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
 		RETURNING id, created_at, updated_at
-	`, q.ExamID, q.QuestionText, q.QuestionType, q.Options, q.CorrectAnswer, q.Points, q.Order).Scan(&q.ID, &q.CreatedAt, &q.UpdatedAt)
+	`, q.ExamID, q.QuestionText, q.QuestionType, q.Options, q.CorrectAnswer, q.Points, q.Order, 
+		q.Passage, q.AudioURL, q.Explanation, q.GradingRubric).Scan(&q.ID, &q.CreatedAt, &q.UpdatedAt)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -95,9 +100,10 @@ func (h *QuestionHandler) UpdateQuestion(c *gin.Context) {
 	_, err := h.DB.Exec(`
 		UPDATE questions 
 		SET exam_id=$1, question_text=$2, question_type=$3, options=$4, correct_answer=$5, 
-		    points=$6, order_num=$7, updated_at=CURRENT_TIMESTAMP 
-		WHERE id=$8
-	`, q.ExamID, q.QuestionText, q.QuestionType, q.Options, q.CorrectAnswer, q.Points, q.Order, id)
+		    points=$6, order_num=$7, passage=$8, audio_url=$9, explanation=$10, grading_rubric=$11, updated_at=CURRENT_TIMESTAMP 
+		WHERE id=$12
+	`, q.ExamID, q.QuestionText, q.QuestionType, q.Options, q.CorrectAnswer, q.Points, q.Order, 
+		q.Passage, q.AudioURL, q.Explanation, q.GradingRubric, id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

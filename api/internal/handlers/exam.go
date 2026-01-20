@@ -88,7 +88,8 @@ func (h *ExamHandler) GetExamWithQuestions(c *gin.Context) {
 	}
 
 	rows, err := h.DB.Query(`
-		SELECT id, exam_id, question_text, question_type, options, correct_answer, points, order_num, created_at, updated_at 
+		SELECT id, exam_id, question_text, question_type, options, correct_answer, points, order_num, 
+		       passage, audio_url, explanation, grading_rubric, created_at, updated_at 
 		FROM questions WHERE exam_id = $1 ORDER BY order_num ASC
 	`, id)
 	if err != nil {
@@ -101,7 +102,8 @@ func (h *ExamHandler) GetExamWithQuestions(c *gin.Context) {
 	for rows.Next() {
 		var q models.Question
 		if err := rows.Scan(&q.ID, &q.ExamID, &q.QuestionText, &q.QuestionType, &q.Options, 
-			&q.CorrectAnswer, &q.Points, &q.Order, &q.CreatedAt, &q.UpdatedAt); err != nil {
+			&q.CorrectAnswer, &q.Points, &q.Order, &q.Passage, &q.AudioURL, &q.Explanation, 
+			&q.GradingRubric, &q.CreatedAt, &q.UpdatedAt); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
