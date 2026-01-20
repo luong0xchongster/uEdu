@@ -8,7 +8,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/joho/godotenv v1.5.1
 	golang.org/x/crypto v0.14.0
-	github.com/sashabaranov/go-openai v1.20.4
+	github.com/sashabaranov/go-openai v1.20.2
 )
 
 require (
