@@ -33,15 +33,15 @@ func (h *CourseHandler) GetCourses(c *gin.Context) {
 
 	var courses []models.Course
 	for rows.Next() {
-		var c models.Course
+		var course models.Course
 		var teacherFirstName, teacherLastName sql.NullString
-		if err := rows.Scan(&c.ID, &c.Name, &c.Description, &c.Level, &c.TeacherID, &c.Capacity, 
-			&c.Price, &c.StartDate, &c.EndDate, &c.CreatedAt, &c.UpdatedAt,
+		if err := rows.Scan(&course.ID, &course.Name, &course.Description, &course.Level, &course.TeacherID, &course.Capacity,
+			&course.Price, &course.StartDate, &course.EndDate, &course.CreatedAt, &course.UpdatedAt,
 			&teacherFirstName, &teacherLastName); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		courses = append(courses, c)
+		courses = append(courses, course)
 	}
 
 	c.JSON(http.StatusOK, courses)
@@ -49,13 +49,13 @@ func (h *CourseHandler) GetCourses(c *gin.Context) {
 
 func (h *CourseHandler) GetCourse(c *gin.Context) {
 	id := c.Param("id")
-	var c models.Course
+	var course models.Course
 	err := h.DB.QueryRow(`
-		SELECT id, name, description, level, teacher_id, capacity, price, 
-		       start_date, end_date, created_at, updated_at 
+		SELECT id, name, description, level, teacher_id, capacity, price,
+		       start_date, end_date, created_at, updated_at
 		FROM courses WHERE id = $1
-	`, id).Scan(&c.ID, &c.Name, &c.Description, &c.Level, &c.TeacherID, &c.Capacity, 
-		&c.Price, &c.StartDate, &c.EndDate, &c.CreatedAt, &c.UpdatedAt)
+	`, id).Scan(&course.ID, &course.Name, &course.Description, &course.Level, &course.TeacherID, &course.Capacity,
+		&course.Price, &course.StartDate, &course.EndDate, &course.CreatedAt, &course.UpdatedAt)
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Course not found"})
@@ -66,7 +66,7 @@ func (h *CourseHandler) GetCourse(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, c)
+	c.JSON(http.StatusOK, course)
 }
 
 func (h *CourseHandler) CreateCourse(c *gin.Context) {

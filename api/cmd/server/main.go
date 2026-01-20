@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
-	"uedu-api/internal/ai"
 	"uedu-api/internal/database"
 	"uedu-api/internal/handlers"
 )
@@ -26,8 +25,6 @@ func main() {
 	if err := database.RunMigrations(); err != nil {
 		log.Fatal("Failed to run migrations:", err)
 	}
-
-	ai.InitClient()
 
 	r := gin.Default()
 
@@ -81,17 +78,6 @@ func main() {
 		api.POST("/exam-results/submit", examResultHandler.SubmitExam)
 		api.GET("/exam-results", examResultHandler.GetExamResults)
 		api.GET("/exam-results/:id/details", examResultHandler.GetExamResultDetails)
-
-		aiHandler := handlers.NewAIHandler()
-		ai := api.Group("/ai")
-		{
-			ai.POST("/exam-generator", aiHandler.GenerateExam)
-			ai.POST("/chatbot", aiHandler.ChatWithBot)
-			ai.DELETE("/chatbot/:student_id", aiHandler.ClearChatHistory)
-			ai.POST("/grading/writing", aiHandler.EvaluateWriting)
-			ai.POST("/grading/rubric", aiHandler.GenerateRubric)
-			ai.POST("/adaptive-difficulty", aiHandler.AdaptiveDifficulty)
-		}
 	}
 
 	port := os.Getenv("PORT")

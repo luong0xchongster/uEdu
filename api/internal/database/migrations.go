@@ -1,9 +1,8 @@
 package database
 
 import (
-	"database/sql"
 	"fmt"
-)
+ )
 
 func RunMigrations() error {
 	migrations := []string{
