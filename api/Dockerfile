@@ -2,10 +2,9 @@ FROM golang:1.21-alpine
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
-RUN go mod download
+RUN apk add --no-cache git
 
 COPY . .
-RUN go build -o server ./cmd/main
+RUN go build -mod=mod -o server ./cmd/main.go
 
 CMD ["./server"]

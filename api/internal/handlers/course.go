@@ -33,15 +33,15 @@ func (h *CourseHandler) GetCourses(c *gin.Context) {
 
 	var courses []models.Course
 	for rows.Next() {
-		var c models.Course
+		var course models.Course
 		var teacherFirstName, teacherLastName sql.NullString
-		if err := rows.Scan(&c.ID, &c.Name, &c.Description, &c.Level, &c.TeacherID, &c.Capacity, 
-			&c.Price, &c.StartDate, &c.EndDate, &c.CreatedAt, &c.UpdatedAt,
+		if err := rows.Scan(&course.ID, &course.Name, &course.Description, &course.Level, &course.TeacherID, &course.Capacity,
+			&course.Price, &course.StartDate, &course.EndDate, &course.CreatedAt, &course.UpdatedAt,
 			&teacherFirstName, &teacherLastName); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		courses = append(courses, c)
+		courses = append(courses, course)
 	}
 
 	c.JSON(http.StatusOK, courses)
@@ -49,13 +49,13 @@ func (h *CourseHandler) GetCourses(c *gin.Context) {
 
 func (h *CourseHandler) GetCourse(c *gin.Context) {
 	id := c.Param("id")
-	var c models.Course
+	var course models.Course
 	err := h.DB.QueryRow(`
-		SELECT id, name, description, level, teacher_id, capacity, price, 
-		       start_date, end_date, created_at, updated_at 
+		SELECT id, name, description, level, teacher_id, capacity, price,
+		       start_date, end_date, created_at, updated_at
 		FROM courses WHERE id = $1
-	`, id).Scan(&c.ID, &c.Name, &c.Description, &c.Level, &c.TeacherID, &c.Capacity, 
-		&c.Price, &c.StartDate, &c.EndDate, &c.CreatedAt, &c.UpdatedAt)
+	`, id).Scan(&course.ID, &course.Name, &course.Description, &course.Level, &course.TeacherID, &course.Capacity,
+		&course.Price, &course.StartDate, &course.EndDate, &course.CreatedAt, &course.UpdatedAt)
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Course not found"})
@@ -66,51 +66,51 @@ func (h *CourseHandler) GetCourse(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, c)
+	c.JSON(http.StatusOK, course)
 }
 
 func (h *CourseHandler) CreateCourse(c *gin.Context) {
-	var c models.Course
-	if err := c.ShouldBindJSON(&c); err != nil {
+	var course models.Course
+	if err := c.ShouldBindJSON(&course); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	err := h.DB.QueryRow(`
-		INSERT INTO courses (name, description, level, teacher_id, capacity, price, start_date, end_date) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+		INSERT INTO courses (name, description, level, teacher_id, capacity, price, start_date, end_date)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id, created_at, updated_at
-	`, c.Name, c.Description, c.Level, c.TeacherID, c.Capacity, c.Price, c.StartDate, c.EndDate).Scan(&c.ID, &c.CreatedAt, &c.UpdatedAt)
+	`, course.Name, course.Description, course.Level, course.TeacherID, course.Capacity, course.Price, course.StartDate, course.EndDate).Scan(&course.ID, &course.CreatedAt, &course.UpdatedAt)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, c)
+	c.JSON(http.StatusCreated, course)
 }
 
 func (h *CourseHandler) UpdateCourse(c *gin.Context) {
 	id := c.Param("id")
-	var c models.Course
-	if err := c.ShouldBindJSON(&c); err != nil {
+	var course models.Course
+	if err := c.ShouldBindJSON(&course); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	_, err := h.DB.Exec(`
-		UPDATE courses 
-		SET name=$1, description=$2, level=$3, teacher_id=$4, capacity=$5, price=$6, 
-		    start_date=$7, end_date=$8, updated_at=CURRENT_TIMESTAMP 
+		UPDATE courses
+		SET name=$1, description=$2, level=$3, teacher_id=$4, capacity=$5, price=$6,
+		    start_date=$7, end_date=$8, updated_at=CURRENT_TIMESTAMP
 		WHERE id=$9
-	`, c.Name, c.Description, c.Level, c.TeacherID, c.Capacity, c.Price, c.StartDate, c.EndDate, id)
+	`, course.Name, course.Description, course.Level, course.TeacherID, course.Capacity, course.Price, course.StartDate, course.EndDate, id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, c)
+	c.JSON(http.StatusOK, course)
 }
 
 func (h *CourseHandler) DeleteCourse(c *gin.Context) {

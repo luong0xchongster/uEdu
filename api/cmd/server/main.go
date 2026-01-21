@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
-	"uedu-api/internal/ai"
 	"uedu-api/internal/database"
 	"uedu-api/internal/handlers"
 )
@@ -26,8 +25,6 @@ func main() {
 	if err := database.RunMigrations(); err != nil {
 		log.Fatal("Failed to run migrations:", err)
 	}
-
-	ai.InitClient()
 
 	r := gin.Default()
 
